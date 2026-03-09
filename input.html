@@ -1,0 +1,263 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  PlayCircle, 
+  CheckCircle2, 
+  ChevronRight, 
+  ChevronDown, 
+  BookOpen, 
+  LayoutDashboard, 
+  Settings, 
+  Users, 
+  Briefcase,
+  Menu,
+  X
+} from 'lucide-react';
+
+const TussLearningApp = () => {
+  const [activeLesson, setActiveLesson] = useState({ module: 0, lesson: 0 });
+  const [completedLessons, setCompletedLessons] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Курсын бүтэц
+  const courseData = [
+    {
+      title: "Бүлэг 1: Удирдамж ба Суурь тохиргоо",
+      icon: <Settings className="w-5 h-5" />,
+      lessons: [
+        { id: "1.1", title: "Tuss.io-ийн тухай ба Нэвтрэх", duration: "05:20", desc: "Системийн үндсэн зорилго, хэрэглэгч үүсгэх болон профайл тохируулах заавар." },
+        { id: "1.2", title: "Интерфэйсийн бүтэц", duration: "04:15", desc: "Цэсүүдийн байршил, мэдэгдэл болон хайлтын функцийг хэрхэн ашиглах вэ?" },
+        { id: "1.3", title: "Байгууллагын бүтэц үүсгэх", duration: "06:45", desc: "Алба хэлтэс, ажилтнуудыг системд бүртгэж, шатлал тогтоох." }
+      ]
+    },
+    {
+      title: "Бүлэг 2: Ажил ба Төслийн удирдлага",
+      icon: <Briefcase className="w-5 h-5" />,
+      lessons: [
+        { id: "2.1", title: "Ажил (Task) үүсгэх ба хуваарилах", duration: "07:30", desc: "Гүйцэтгэгч томилох, хугацаа болон ач холбогдлын эрэмбэ тогтоох." },
+        { id: "2.2", title: "Канбан самбар ашиглах", duration: "05:10", desc: "Ажлын явцыг харах, төлөв өөрчлөх болон шүүлтүүр ашиглах." },
+        { id: "2.3", title: "Төсөл үүсгэх", duration: "08:20", desc: "Олон ажлыг нэгтгэж, төслийн төлөвлөгөө болон Gantt chart-тай ажиллах." },
+        { id: "2.4", title: "Цаг бүртгэл ба Гүйцэтгэлийн тайлан", duration: "04:50", desc: "Ажилд зарцуулсан бодит цагийг хэмжиж, тайлан гаргах." }
+      ]
+    },
+    {
+      title: "Бүлэг 3: Процессын удирдлага",
+      icon: <LayoutDashboard className="w-5 h-5" />,
+      lessons: [
+        { id: "3.1", title: "Процессын зураглал гаргах", duration: "10:15", desc: "Бизнес процессыг алхам алхмаар хэрхэн загварчлах вэ?" },
+        { id: "3.2", title: "Процесс ба Ажлын уялдаа", duration: "09:00", desc: "Процессоос автоматаар ажил үүсгэх тохиргоог хийх." },
+        { id: "3.3", title: "Дүрэм журам ба зааварчилгаа", duration: "06:30", desc: "Процессын алхам бүрт холбогдох баримт бичгийг байршуулах." }
+      ]
+    },
+    {
+      title: "Бүлэг 4: Хяналт ба Дата анализ",
+      icon: <Users className="w-5 h-5" />,
+      lessons: [
+        { id: "4.1", title: "Дашборд (Dashboard) ашиглах", duration: "07:00", desc: "Байгууллагын үндсэн үзүүлэлтүүдийг нэг дороос хянах." },
+        { id: "4.2", title: "Ажилтны үнэлгээ ба KPI", duration: "08:45", desc: "Гүйцэтгэл дээр суурилсан бодит үнэлгээний систем." },
+        { id: "4.3", title: "Файл болон мэдлэгийн сан", duration: "05:30", desc: "Мэдээллийг системтэй хадгалах, хайх болон удирдах." }
+      ]
+    }
+  ];
+
+  const currentLessonData = courseData[activeLesson.module].lessons[activeLesson.lesson];
+
+  const toggleComplete = (lessonId) => {
+    if (completedLessons.includes(lessonId)) {
+      setCompletedLessons(completedLessons.filter(id => id !== lessonId));
+    } else {
+      setCompletedLessons([...completedLessons, lessonId]);
+    }
+  };
+
+  const calculateProgress = () => {
+    const totalLessons = courseData.reduce((acc, module) => acc + module.lessons.length, 0);
+    return Math.round((completedLessons.length / totalLessons) * 100);
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50 text-gray-900 font-sans overflow-hidden">
+      {/* Sidebar Navigation */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
+        <div className="flex flex-col h-full">
+          <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">T</div>
+              <h1 className="text-xl font-bold text-gray-800">Tuss.io Academy</h1>
+            </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-gray-400">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="p-4 border-b border-gray-100">
+            <div className="flex justify-between text-sm font-medium mb-2">
+              <span className="text-gray-500">Нийт явц</span>
+              <span className="text-blue-600">{calculateProgress()}%</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-500" 
+                style={{ width: `${calculateProgress()}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-gray-200">
+            {courseData.map((module, mIdx) => (
+              <div key={mIdx} className="mb-4">
+                <div className="px-6 py-2 flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  {module.icon}
+                  {module.title}
+                </div>
+                {module.lessons.map((lesson, lIdx) => (
+                  <button
+                    key={lesson.id}
+                    onClick={() => setActiveLesson({ module: mIdx, lesson: lIdx })}
+                    className={`w-full flex items-center gap-3 px-6 py-3 transition-colors ${
+                      activeLesson.module === mIdx && activeLesson.lesson === lIdx 
+                        ? 'bg-blue-50 border-r-4 border-blue-600 text-blue-700' 
+                        : 'hover:bg-gray-50 text-gray-600'
+                    }`}
+                  >
+                    {completedLessons.includes(lesson.id) ? (
+                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    ) : (
+                      <PlayCircle className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    )}
+                    <div className="flex flex-col items-start text-left">
+                      <span className="text-sm font-medium leading-tight">{lesson.title}</span>
+                      <span className="text-xs text-gray-400 mt-1">{lesson.duration}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 bg-white">
+        <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-gray-100 shrink-0">
+          <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+            <Menu className="w-6 h-6" />
+          </button>
+          <div className="flex-1 md:flex-none">
+            <nav className="text-sm font-medium text-gray-500 flex items-center gap-2">
+              <span>Хичээл {currentLessonData.id}</span>
+              <ChevronRight className="w-4 h-4" />
+              <span className="text-gray-900 truncate max-w-[200px] md:max-w-none">{currentLessonData.title}</span>
+            </nav>
+          </div>
+          <div className="hidden sm:flex items-center gap-4">
+             <button className="text-sm font-medium px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Тусламж</button>
+             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
+                AD
+             </div>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          <div className="max-w-4xl mx-auto">
+            {/* Video Player Placeholder */}
+            <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl mb-8 group">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                   <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
+                      <PlayCircle className="w-10 h-10 text-white fill-current" />
+                   </div>
+                   <p className="text-white mt-4 font-medium">Видео бичлэг энд тоглогдоно</p>
+                </div>
+              </div>
+              {/* Fake Controls */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                <div className="h-1 w-full bg-gray-600 rounded-full mb-4">
+                  <div className="h-full w-1/3 bg-blue-500 rounded-full"></div>
+                </div>
+                <div className="flex items-center justify-between text-white text-xs">
+                   <span>00:00 / {currentLessonData.duration}</span>
+                   <div className="flex gap-4">
+                      <Settings className="w-4 h-4 cursor-pointer" />
+                      <LayoutDashboard className="w-4 h-4 cursor-pointer" />
+                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{currentLessonData.title}</h2>
+                <p className="text-gray-600 leading-relaxed mb-6">
+                  {currentLessonData.desc}
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <h4 className="text-sm font-bold text-gray-700 mb-1">Энэ хичээлээр үзэх зүйл:</h4>
+                    <ul className="text-sm text-gray-600 space-y-2 mt-3">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                        Үндсэн ойлголт ба логик
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                        Бодит жишээ дээрх дасгал
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <h4 className="text-sm font-bold text-gray-700 mb-1">Хэрэгтэй файлууд:</h4>
+                    <button className="text-sm text-blue-600 hover:underline mt-3 flex items-center gap-2">
+                       Гарын авлага татах (PDF)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="shrink-0">
+                <button 
+                  onClick={() => toggleComplete(currentLessonData.id)}
+                  className={`w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-sm ${
+                    completedLessons.includes(currentLessonData.id)
+                    ? 'bg-green-100 text-green-700 border border-green-200'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+                >
+                  {completedLessons.includes(currentLessonData.id) ? (
+                    <>
+                      <CheckCircle2 className="w-5 h-5" />
+                      Дууссан
+                    </>
+                  ) : (
+                    <>
+                      Хичээл дуусгах
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Bottom Navigation */}
+            <div className="mt-12 pt-8 border-t border-gray-100 flex items-center justify-between">
+               <button 
+                disabled={activeLesson.module === 0 && activeLesson.lesson === 0}
+                className="flex items-center gap-2 text-sm font-bold text-gray-400 disabled:opacity-30"
+               >
+                  <ChevronDown className="w-5 h-5 rotate-90" />
+                  Өмнөх хичээл
+               </button>
+               <button 
+                className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700"
+               >
+                  Дараагийн хичээл
+                  <ChevronDown className="w-5 h-5 -rotate-90" />
+               </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default TussLearningApp;
